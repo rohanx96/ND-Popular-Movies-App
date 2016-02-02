@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/sort_order_text"
+        android:layout_width="wrap_content"
+        android:layout_height="?actionBarSize"
+        android:text="Sort Order: "
+        android:layout_alignParentLeft="true"
+        android:background="@color/colorAccent"
+        android:paddingLeft="16dp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title"
+        android:layout_alignTop="@+id/sort_order_spinner"
+        android:layout_alignBottom="@+id/sort_order_spinner"/>
+    <Spinner
+        android:id="@+id/sort_order_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:entries="@array/sort_order"
+        android:background="@color/colorAccent"
+        android:layout_toRightOf="@id/sort_order_text"
+        android:gravity="center">
+    </Spinner>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/movie_list_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/sort_order_spinner">
+    </android.support.v7.widget.RecyclerView>
+</RelativeLayout>
