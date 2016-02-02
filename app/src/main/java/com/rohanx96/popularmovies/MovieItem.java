@@ -9,7 +9,8 @@ public class MovieItem {
     private String mMovieName;
     private String mMovieOverview;
     private String mMovieImage;
-    private float mMovieRating;
+    private double mMovieRating;
+    private double mMoviePopularity;
 
     public int getID() {
         return mMovieID;
@@ -43,11 +44,19 @@ public class MovieItem {
         this.mMovieImage = mMovieImage;
     }
 
-    public float getRating() {
+    public double getRating() {
         return mMovieRating;
     }
 
-    public void setRating(float mMovieRating) {
+    public void setRating(double mMovieRating) {
         this.mMovieRating = mMovieRating;
+    }
+
+    public double getPopularity() {
+        return mMoviePopularity;
+    }
+
+    public void setPopularity(double mMoviePopularity) {
+        this.mMoviePopularity = mMoviePopularity;
     }
 }

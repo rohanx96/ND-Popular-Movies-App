@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="most_popular">Most Popular</string>
+    <string name="latest">Latest</string>
+    <string name="movies">Movies</string>
     <string-array name="sort_order">
         <item name="popular">Most Popular</item>
         <item name="rating">Highest Rated</item>
     </string-array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
