@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
+ */
+
 package com.rohanx96.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +22,7 @@ import java.util.ArrayList;
 
 /**
  * Created by rose on 2/2/16.
- * Recycler View Adapter implementation to be used for populating movies list in MovieList Fragment
+ * Recycler View Adapter implementation which is used for populating movies list in MovieList Fragment
  */
 public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
     ArrayList<MovieItem> mDataList;
@@ -32,9 +39,6 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        // prevents binding when new ArrayList is passed as argument to adapter
-        if (position == mDataList.size())
-            return;
         MovieItemViewHolder viewHolder = (MovieItemViewHolder) holder;
         MovieItem item = mDataList.get(position);
         try {
@@ -61,10 +65,29 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
     class MovieItemViewHolder extends RecyclerView.ViewHolder {
         private ImageView movieImage;
         private TextView movieName;
+        private CardView container;
         public MovieItemViewHolder(View itemView) {
             super(itemView);
             movieImage = (ImageView) itemView.findViewById(R.id.movie_item_image);
             movieName = (TextView) itemView.findViewById(R.id.movie_item_name);
+            container = (CardView) itemView.findViewById(R.id.movie_item_card);
+            container.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MovieItem item = mDataList.get(getAdapterPosition());
+                    Intent details = new Intent(context,MovieDetailActivity.class);
+                    // Pass the movie item details to the intent so they can be fetched in the new activity
+                    Bundle args = new Bundle();
+                    args.putString("name",item.getName());
+                    args.putString("overview",item.getOverview());
+                    args.putDouble("rating",item.getRating());
+                    args.putDouble("pop",item.getPopularity());
+                    args.putString("image",item.getImage());
+                    args.putString("date",item.getDate());
+                    details.putExtras(args);
+                    context.startActivity(details);
+                }
+            });
         }
     }
 }

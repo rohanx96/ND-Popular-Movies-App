@@ -2,15 +2,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/nav_popular"
         android:icon="@drawable/ic_popular"
-        android:title="@string/most_popular"/>
+        android:title="@string/most_popular"
+        android:checked="true"
+        android:checkable="true"/>
+
     <item android:id="@+id/nav_rating"
         android:icon="@drawable/ic_rating"
-        android:title="Top Rated"/>
+        android:title="@string/top_rated"
+        android:checkable="true"/>
+
     <item android:id="@+id/nav_latest"
         android:icon="@drawable/ic_latest"
-        android:title="@string/latest"/>
+        android:title="@string/latest"
+        android:checkable="true"/>
+
     <item android:id="@+id/nav_revenue"
         android:icon="@drawable/ic_revenue"
-        android:title="Top Grossing"/>
+        android:title="@string/top_grossing"
+        android:checkable="true"/>
 
 </menu>

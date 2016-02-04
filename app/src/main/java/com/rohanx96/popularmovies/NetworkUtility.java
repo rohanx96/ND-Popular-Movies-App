@@ -1,5 +1,12 @@
+/*
+ * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
+ */
+
 package com.rohanx96.popularmovies;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -12,13 +19,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Created by rose on 2/2/16.
@@ -36,39 +40,62 @@ public class NetworkUtility {
     public static final String API_KEY_PARAM = "api_key";
     public static final String API_KEY = "";
 
+    /** Generates URL string query for fetching movies sorted by popularity */
     public static String getURLForPopularMovies() {
         Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_POPULAR).appendQueryParameter(API_KEY_PARAM, API_KEY).build();
         return builtUri.toString();
     }
 
+    /** Generates URL string query for fetching movies sorted by rating */
     public static String getUrlForTopRatedMovies(){
         Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_RATING)
                 .appendQueryParameter(API_KEY_PARAM, API_KEY).build();
         return builtUri.toString();
     }
 
+    /** Generates URL string query for fetching movies sorted by release date */
     public static String getUrlForLatestMovies(){
         Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_LATEST)
                 .appendQueryParameter(API_KEY_PARAM,API_KEY).build();
         return builtUri.toString();
     }
 
+    /** Generates URL string query for fetching movies sorted by revenue */
     public static String getUrlForTopGrossingMovies(){
         Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_REVENUE)
                 .appendQueryParameter(API_KEY_PARAM,API_KEY).build();
         return builtUri.toString();
     }
+
+    /** Generates URL string query for fetching movie poster according to file path received */
     public static Uri generateUrlForImage(String path) throws MalformedURLException {
         Uri builtUri = Uri.parse(IMAGE_MAIN_URL).buildUpon().appendPath(IMAGE_SIZE).appendPath(path).build();
         //Log.i("imageUri",builtUri.toString());
         return builtUri;
     }
 
+    /** Checks if internet is avilable */
+    public static boolean isInternetAvailable(Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo info = connectivityManager.getActiveNetworkInfo();
+        return (info != null && info.isConnected());
+    }
+
+    /**
+     * Async Task that fetches movie list according to sort order string received as parameter.
+     * It uses AsyncTaskCallback to report the progress to the parent of the task
+     */
     public static class LoadURL extends AsyncTask<String,Void,ArrayList<MovieItem>>{
         AsyncTaskCallback callback;
 
         public LoadURL(AsyncTaskCallback callback) {
             this.callback = callback;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            callback.showProgressBar();
         }
 
         @Override
@@ -84,18 +111,20 @@ public class NetworkUtility {
 
         @Override
         protected void onPostExecute(ArrayList<MovieItem> data) {
-            callback.setDataList(data);
+            if(data!=null) {
+                callback.setDataList(data);
+                callback.hideErrorText();
+            }
+            else callback.showErrorText();
+            callback.hideProgressBar();
         }
 
-        // Given a URL, establishes an HttpUrlConnection and retrieves
-        // the web page content as a InputStream, which it returns as
-        // a string.
+        /**
+         * Given a URL, establishes an HttpUrlConnection and retrieves the web page content as a InputStream, which it returns as
+         * a string.
+         */
         private String downloadUrl(String myurl) throws IOException {
             InputStream is = null;
-            // Only display the first 500 characters of the retrieved
-            // web page content.
-            //int len = 5000;
-
             try {
                 URL url = new URL(myurl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -103,9 +132,8 @@ public class NetworkUtility {
                 conn.setConnectTimeout(15000 /* milliseconds */);
                 conn.setRequestMethod("GET");
                 conn.setDoInput(true);
-                // Starts the query
                 conn.connect();
-                int response = conn.getResponseCode();
+                //if (conn.getResponseCode() == HttpURLConnection.HTTP_OK)
                 //Log.d(DEBUG_TAG, "The response is: " + response);
                 is = conn.getInputStream();
 
@@ -115,32 +143,20 @@ public class NetworkUtility {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
                     buffer.append(line).append("\n");
                 }
                 Log.i("receivedString",buffer.toString());
                 return buffer.toString();
-                // Makes sure that the InputStream is closed after the app is
-                // finished using it.
+                // Makes sure that the InputStream is closed after the app is finished using it.
             } finally {
                 if (is != null) {
                     is.close();
                 }
             }
         }
-
-        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-            Reader reader = null;
-            reader = new InputStreamReader(stream, "UTF-8");
-            char[] buffer = new char[len];
-            reader.read(buffer);
-            Log.i("receivedString",new String(buffer));
-            return new String(buffer);
-        }
     }
 
+    /** Parses the JSON string received to generate an ArrayList of MovieItem objects */
     public static ArrayList<MovieItem> parseJson(String jsonString){
         ArrayList<MovieItem> movieList = new ArrayList<>();
         try {
@@ -149,17 +165,21 @@ public class NetworkUtility {
             for(int i = 0;i<moviesArray.length();i++) {
                 JSONObject movieObject = moviesArray.getJSONObject(i);
                 MovieItem item = new MovieItem();
+                // The keys are set according to the default format provided by TheMovieDb API for discover query
                 item.setID(movieObject.getInt("id"));
                 item.setImage(movieObject.getString("poster_path").substring(1));
                 item.setName(movieObject.getString("title"));
                 item.setOverview(movieObject.getString("overview"));
                 item.setRating(movieObject.getDouble("vote_average"));
                 item.setPopularity(movieObject.getDouble("popularity"));
+                item.setDate(movieObject.getString("release_date"));
                 movieList.add(item);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return movieList;
+        if (movieList.isEmpty())
+            return null;
+        else return movieList;
     }
 }

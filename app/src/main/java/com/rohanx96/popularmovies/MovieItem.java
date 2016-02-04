@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
+ */
+
 package com.rohanx96.popularmovies;
 
 /**
  * Created by rose on 2/2/16.
- * This class defines the variables and methods for a movie object which is used to populate data for recycler view through an ArrayList
+ * This class defines the variables and methods for a movie item. The movie item holds the various details of a particular movie.
  */
 public class MovieItem {
     private int mMovieID;
@@ -11,6 +15,7 @@ public class MovieItem {
     private String mMovieImage;
     private double mMovieRating;
     private double mMoviePopularity;
+    private String mMovieDate;
 
     public int getID() {
         return mMovieID;
@@ -58,5 +63,13 @@ public class MovieItem {
 
     public void setPopularity(double mMoviePopularity) {
         this.mMoviePopularity = mMoviePopularity;
+    }
+
+    public String getDate() {
+        return mMovieDate;
+    }
+
+    public void setDate(String mMovieDate) {
+        this.mMovieDate = mMovieDate;
     }
 }

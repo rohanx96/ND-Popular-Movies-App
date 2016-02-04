@@ -7,7 +7,13 @@
         <item name="popular">Most Popular</item>
         <item name="rating">Highest Rated</item>
     </string-array>
-
+    <string name="rating_format">Rating: %.2f</string>
+    <string name="popularity_format">Popularity: %.2f</string>
+    <string name="date_format">Release Date:\n%s</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="check_internet_connnection">Please check your internet connection</string>
+    <string name="overview">OVERVIEW</string>
+    <string name="top_grossing">Top Grossing</string>
+    <string name="top_rated">Top Rated</string>
 </resources>

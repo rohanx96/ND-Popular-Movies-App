@@ -31,7 +31,9 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_home"
-        app:menu="@menu/nav_menu">
+        app:menu="@menu/nav_menu"
+        android:background="@color/background_light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark">
     </android.support.design.widget.NavigationView>
 
 </android.support.v4.widget.DrawerLayout>
