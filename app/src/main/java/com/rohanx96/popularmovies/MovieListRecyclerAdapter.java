@@ -20,6 +20,10 @@ import com.squareup.picasso.Picasso;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * Created by rose on 2/2/16.
  * Recycler View Adapter implementation which is used for populating movies list in MovieList Fragment
@@ -42,7 +46,10 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
         MovieItemViewHolder viewHolder = (MovieItemViewHolder) holder;
         MovieItem item = mDataList.get(position);
         try {
-           Picasso.with(context).load(NetworkUtility.generateUrlForImage(item.getImage())).into(viewHolder.movieImage);
+            // error() sets the drawable when there is problem loading url or some error occurs. It also prevents null exceptions caused due to
+            // errors. It will retry three times before setting the error image
+           Picasso.with(context).load(NetworkUtility.generateUrlForImage(item.getImage())).placeholder(R.drawable.default_movie_poster)
+                   .error(R.drawable.default_movie_poster).into(viewHolder.movieImage);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -63,31 +70,21 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     class MovieItemViewHolder extends RecyclerView.ViewHolder {
-        private ImageView movieImage;
-        private TextView movieName;
-        private CardView container;
+        @Bind(R.id.movie_item_image) ImageView movieImage;
+        @Bind(R.id.movie_item_name) TextView movieName;
+
         public MovieItemViewHolder(View itemView) {
             super(itemView);
-            movieImage = (ImageView) itemView.findViewById(R.id.movie_item_image);
-            movieName = (TextView) itemView.findViewById(R.id.movie_item_name);
-            container = (CardView) itemView.findViewById(R.id.movie_item_card);
-            container.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MovieItem item = mDataList.get(getAdapterPosition());
-                    Intent details = new Intent(context,MovieDetailActivity.class);
-                    // Pass the movie item details to the intent so they can be fetched in the new activity
-                    Bundle args = new Bundle();
-                    args.putString("name",item.getName());
-                    args.putString("overview",item.getOverview());
-                    args.putDouble("rating",item.getRating());
-                    args.putDouble("pop",item.getPopularity());
-                    args.putString("image",item.getImage());
-                    args.putString("date",item.getDate());
-                    details.putExtras(args);
-                    context.startActivity(details);
-                }
-            });
+            ButterKnife.bind(this,itemView);
+        }
+
+        @OnClick(R.id.movie_item_card)
+        public void startDetailActivity(View v){
+            MovieItem item = mDataList.get(getAdapterPosition());
+            Intent details = new Intent(context,MovieDetailActivity.class);
+            // Pass the movie item object to the intent so they can be fetched in the new activity
+            details.putExtra("movie_item", item);
+            context.startActivity(details);
         }
     }
 }

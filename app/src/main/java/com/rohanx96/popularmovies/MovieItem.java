@@ -4,11 +4,16 @@
 
 package com.rohanx96.popularmovies;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by rose on 2/2/16.
  * This class defines the variables and methods for a movie item. The movie item holds the various details of a particular movie.
+ * The class implements Parcelable so that a movie object can be passed easily via intents or in saving and restoring states on
+ * configuration changes
  */
-public class MovieItem {
+public class MovieItem implements Parcelable{
     private int mMovieID;
     private String mMovieName;
     private String mMovieOverview;
@@ -16,6 +21,30 @@ public class MovieItem {
     private double mMovieRating;
     private double mMoviePopularity;
     private String mMovieDate;
+
+    public MovieItem(){}
+
+    protected MovieItem(Parcel in) {
+        mMovieID = in.readInt();
+        mMovieName = in.readString();
+        mMovieOverview = in.readString();
+        mMovieImage = in.readString();
+        mMovieRating = in.readDouble();
+        mMoviePopularity = in.readDouble();
+        mMovieDate = in.readString();
+    }
+
+    public static final Creator<MovieItem> CREATOR = new Creator<MovieItem>() {
+        @Override
+        public MovieItem createFromParcel(Parcel in) {
+            return new MovieItem(in);
+        }
+
+        @Override
+        public MovieItem[] newArray(int size) {
+            return new MovieItem[size];
+        }
+    };
 
     public int getID() {
         return mMovieID;
@@ -71,5 +100,21 @@ public class MovieItem {
 
     public void setDate(String mMovieDate) {
         this.mMovieDate = mMovieDate;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.mMovieID);
+        dest.writeString(this.mMovieName);
+        dest.writeString(this.mMovieOverview);
+        dest.writeString(this.mMovieImage);
+        dest.writeDouble(this.mMovieRating);
+        dest.writeDouble(this.mMoviePopularity);
+        dest.writeString(this.mMovieDate);
     }
 }
