@@ -4,6 +4,7 @@
 
 package com.rohanx96.popularmovies;
 
+import android.database.Cursor;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,12 +16,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * This is the activity displayed on application startup. The activity hosts the MovieListFragment to display the list of movies.
  * The activity also implements a navigation view which provides options to users to select the sort order of movies
  */
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     String mCurrentSort; // Stores the current sort order displayed
+    private final static String SORT_FAVOURITES = "favourites";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     mCurrentSort = NetworkUtility.SORT_REVENUE;
                     setTitle(getString(R.string.top_grossing));
                     break;
+                case R.id.nav_favourites:
+                    if(!mCurrentSort.equals(SORT_FAVOURITES))
+                        updateDataList(SORT_FAVOURITES);
+                    mCurrentSort = SORT_FAVOURITES;
+                    setTitle(getString(R.string.favourites));
             }
         }
         else {
@@ -85,8 +94,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /** Refreshes data list when a new sort order is selected */
     public void updateDataList(String sortOrder){
-        NetworkUtility.LoadURL task = new NetworkUtility.LoadURL
-                ((MovieListFragment)getSupportFragmentManager().findFragmentById(R.id.movie_list_fragment_container));
-        task.execute(sortOrder);
+
+        // If the user choses to view favourites load the datalist from database accordingly
+        if (sortOrder.equals(SORT_FAVOURITES)){
+            Cursor cursor = getContentResolver().query(FavouritesContract.FavouritesEntry.CONTENT_URI, null, null, null, null);
+            ArrayList<MovieItem> dataList = new ArrayList<>();
+            try {
+                if (cursor.moveToFirst()){
+                    do {
+                        dataList.add(MovieItem.createMovieItemFromDatabase(cursor));
+                    }while (cursor.moveToNext());
+                }
+            }
+            finally {
+                cursor.close();
+                ((MovieListFragment)getSupportFragmentManager().findFragmentById(R.id.movie_list_fragment_container)).setDataList(dataList);
+            }
+        }else {
+            NetworkUtility.LoadURL task = new NetworkUtility.LoadURL
+                    ((MovieListFragment) getSupportFragmentManager().findFragmentById(R.id.movie_list_fragment_container));
+            task.execute(sortOrder);
+        }
     }
 }

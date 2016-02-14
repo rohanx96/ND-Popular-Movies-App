@@ -16,4 +16,6 @@
     <string name="overview">OVERVIEW</string>
     <string name="top_grossing">Top Grossing</string>
     <string name="top_rated">Top Rated</string>
+    <string name="add_favourite">Add To favorites</string>
+    <string name="favourites">Favourites</string>
 </resources>

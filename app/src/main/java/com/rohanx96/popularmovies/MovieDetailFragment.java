@@ -4,6 +4,10 @@
 
 package com.rohanx96.popularmovies;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,6 +15,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +28,7 @@ import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by rose on 3/2/16.
@@ -35,6 +41,9 @@ public class MovieDetailFragment extends Fragment {
     @Bind(R.id.movie_detail_popularity)TextView mPopularity;
     @Bind(R.id.movie_detail_image)ImageView mImage;
     @Bind(R.id.movie_detail_date)TextView mDate;
+    @Bind(R.id.movie_detail_add_favorite) ImageButton mAddFavourite;
+    private MovieItem mItem;
+    private boolean isFavourite; // Stores if the movie is added to favourites
 
     @Nullable
     @Override
@@ -48,28 +57,65 @@ public class MovieDetailFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Bundle args = getArguments();
-        MovieItem item = args.getParcelable("movie_item");
+        mItem = args.getParcelable("movie_item");
         // Movie details updated according to the arguments received
-        mName.setText(item.getName());
-        mRating.setText(String.format(getString(R.string.rating_format),item.getRating()));
-        mPopularity.setText(String.format(getString(R.string.popularity_format), item.getPopularity()));
-        mOverview.setText(item.getOverview());
+        mName.setText(mItem.getName());
+        mRating.setText(String.format(getString(R.string.rating_format), mItem.getRating()));
+        mPopularity.setText(String.format(getString(R.string.popularity_format), mItem.getPopularity()));
+        mOverview.setText(mItem.getOverview());
         try {
             // error() sets the drawable when there is problem loading url or some error occurs. It also prevents null exceptions caused due to
             // errors. It will retry three times before setting the error image
-            Picasso.with(getActivity()).load(NetworkUtility.generateUrlForImage(item.getImage())).placeholder(R.drawable.default_movie_poster)
+            Picasso.with(getActivity()).load(NetworkUtility.generateUrlForImage(mItem.getImage())).placeholder(R.drawable.default_movie_poster)
                     .error(R.drawable.default_movie_poster).into(mImage);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            Date date = dateFormat.parse(item.getDate());
+            Date date = dateFormat.parse(mItem.getDate());
             java.text.DateFormat localFormat = DateFormat.getDateFormat(getActivity());
-            mDate.setText(String.format(getString(R.string.date_format),localFormat.format(date)));
+            mDate.setText(String.format(getString(R.string.date_format), localFormat.format(date)));
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        // Uri query to find movie by ID
+        Uri query = FavouritesContract.FavouritesEntry.CONTENT_URI.buildUpon().appendPath(Integer.toString(mItem.getID())).build();
+        Cursor cursor = getContext().getContentResolver().query(query, new String[]{FavouritesContract.FavouritesEntry.COL_ID}, null, null
+                , null);
+        try{
+            if (cursor.moveToFirst() && cursor.getCount() == 1){
+                isFavourite = true;
+                mAddFavourite.setImageResource(R.drawable.ic_heart_checked);
+            } else
+                isFavourite = false;
+        }
+        finally {
+            cursor.close();
+        }
 
+    }
+
+    @OnClick(R.id.movie_detail_add_favorite)
+    public void addFavourite(){
+        if (isFavourite){
+            getContext().getContentResolver().delete(FavouritesContract.FavouritesEntry.CONTENT_URI,
+                    FavouritesContract.FavouritesEntry.COL_ID + " = ?",new String[]{Integer.toString(mItem.getID())});
+            isFavourite = false;
+            mAddFavourite.setImageResource(R.drawable.ic_heart_unchecked);
+        } else {
+            ContentResolver contentResolver = getContext().getContentResolver();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_ID, mItem.getID());
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_IMAGE, mItem.getImage());
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_NAME, mItem.getName());
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_OVERVIEW, mItem.getOverview());
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_POPULARITY, mItem.getPopularity());
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_RATING, mItem.getRating());
+            contentValues.put(FavouritesContract.FavouritesEntry.COL_DATE,mItem.getDate());
+            contentResolver.insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
+            isFavourite = true;
+            mAddFavourite.setImageResource(R.drawable.ic_heart_checked);
+        }
     }
 }

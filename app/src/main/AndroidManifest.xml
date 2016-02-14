@@ -9,6 +9,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:authorities="com.rohanx96.popularmovies"
+            android:name=".FavouritesProvider"/>
         <activity android:name=".MainActivity"
             android:label="@string/movies"
             android:theme="@style/AppTheme.NoActionBar">

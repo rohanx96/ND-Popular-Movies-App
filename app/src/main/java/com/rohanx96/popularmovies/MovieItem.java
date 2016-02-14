@@ -4,6 +4,7 @@
 
 package com.rohanx96.popularmovies;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -116,5 +117,18 @@ public class MovieItem implements Parcelable{
         dest.writeDouble(this.mMovieRating);
         dest.writeDouble(this.mMoviePopularity);
         dest.writeString(this.mMovieDate);
+    }
+
+    /** This method is used to create a movieItem object from a cursor returned from query to database */
+    public static MovieItem createMovieItemFromDatabase(Cursor cursor){
+        MovieItem item = new MovieItem();
+        item.setID(cursor.getInt(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_ID)));
+        item.setName(cursor.getString(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_NAME)));
+        item.setDate(cursor.getString(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_DATE)));
+        item.setPopularity(cursor.getDouble(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_POPULARITY)));
+        item.setOverview(cursor.getString(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_OVERVIEW)));
+        item.setImage(cursor.getString(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_IMAGE)));
+        item.setRating(cursor.getDouble(cursor.getColumnIndex(FavouritesContract.FavouritesEntry.COL_RATING)));
+        return item;
     }
 }
