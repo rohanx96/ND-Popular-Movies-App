@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.rohanx96.popularmovies.FavouritesContract.FavouritesEntry;
 
 /**
+ * The database helper class to get readable or writable database for our application
  * Created by rose on 11/2/16.
  */
 public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
@@ -18,10 +19,6 @@ public class FavoritesDatabaseHelper extends SQLiteOpenHelper {
 
     public FavoritesDatabaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-
-    public FavoritesDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
     }
 
     @Override

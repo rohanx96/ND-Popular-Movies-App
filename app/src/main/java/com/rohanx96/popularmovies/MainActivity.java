@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /** Refreshes data list when a new sort order is selected */
     public void updateDataList(String sortOrder){
 
-        // If the user choses to view favourites load the datalist from database accordingly
+        // If the user chooses to view favourites load the datalist from database accordingly
         if (sortOrder.equals(SORT_FAVOURITES)){
             Cursor cursor = getContentResolver().query(FavouritesContract.FavouritesEntry.CONTENT_URI, null, null, null, null);
             ArrayList<MovieItem> dataList = new ArrayList<>();
