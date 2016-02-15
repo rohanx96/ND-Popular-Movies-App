@@ -43,6 +43,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mCurrentSort = NetworkUtility.SORT_POPULAR; // Sort order is by popularity when activity is started
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // This refreshes the favourites list when returning to activity
+        if(mCurrentSort.equals(SORT_FAVOURITES))
+            updateDataList(SORT_FAVOURITES);
+    }
+
     /**
      * Refreshes the movies list based on the option clicked in the navigation drawer. Checks if the current sort order is same as
      * the selected sort order and if not then updates the movie list based on the sort order selected
@@ -108,10 +116,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             finally {
                 cursor.close();
-                ((MovieListFragment)getSupportFragmentManager().findFragmentById(R.id.movie_list_fragment_container)).setDataList(dataList);
+                ((MovieListFragment)getSupportFragmentManager().findFragmentById(R.id.movie_list_fragment_container)).setMovieDataList(dataList);
             }
         }else {
-            NetworkUtility.LoadURL task = new NetworkUtility.LoadURL
+            AsyncTasks.FetchMovieList task = new AsyncTasks.FetchMovieList
                     ((MovieListFragment) getSupportFragmentManager().findFragmentById(R.id.movie_list_fragment_container));
             task.execute(sortOrder);
         }

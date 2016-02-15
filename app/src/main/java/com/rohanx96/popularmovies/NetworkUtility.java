@@ -29,14 +29,18 @@ import java.util.ArrayList;
  * Provides several methods to help in network related tasks performed in the application such as generating , building and fetching urls
  */
 public class NetworkUtility {
+    public static final String MAIN_URL_MOVIE = "http://api.themoviedb.org/3/movie";
     public static final String MAIN_URL_DISCOVER = "http://api.themoviedb.org/3/discover/movie?";
     public static final String IMAGE_MAIN_URL = "http://image.tmdb.org/t/p/";
+    public static final String YOUTUBE_THUMBNAIL_URL = "http://img.youtube.com/vi/";
     public static final String IMAGE_SIZE = "w185";
     public static final String SORT_KEY = "sort_by";
     public static final String SORT_POPULAR = "popularity.desc";
     public static final String SORT_RATING = "vote_average.desc";
     public static final String SORT_LATEST = "primary_release_date.desc";
     public static final String SORT_REVENUE = "revenue.desc";
+    public static final String PATH_VIDEOS = "videos";
+    public static final String PATH_REVIEWS = "reviews";
     public static final String API_KEY_PARAM = "api_key";
     public static final String API_KEY = "";
 
@@ -74,7 +78,24 @@ public class NetworkUtility {
         return builtUri;
     }
 
-    /** Checks if internet is avilable */
+    /** Generates uri for videos based on ID received for the movie */
+    public static Uri generateUriForVideos(String key){
+        return Uri.parse(MAIN_URL_MOVIE).buildUpon().appendPath(key).appendPath(PATH_VIDEOS).appendQueryParameter(API_KEY_PARAM,API_KEY)
+        .build();
+    }
+
+    /** Generates uri for reviews based on ID received for the movie */
+    public static Uri generateUriForReviews(String key){
+        return Uri.parse(MAIN_URL_MOVIE).buildUpon().appendPath(key).appendPath(PATH_REVIEWS).appendQueryParameter(API_KEY_PARAM,API_KEY)
+                .build();
+    }
+
+    /** Generates uri to get video thumbnail from video id */
+    public static Uri generateUriForThumbnail(String key){
+        return Uri.parse(YOUTUBE_THUMBNAIL_URL).buildUpon().appendPath(key).appendPath("hqdefault.jpg").build();
+    }
+
+    /** Checks if internet is available */
     public static boolean isInternetAvailable(Context context){
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
@@ -82,76 +103,37 @@ public class NetworkUtility {
     }
 
     /**
-     * Async Task that fetches movie list according to sort order string received as parameter.
-     * It uses AsyncTaskCallback to report the progress to the parent of the task
+     * Given a URL, establishes an HttpUrlConnection and retrieves the web page content as a InputStream, which it returns as
+     * a string.
      */
-    public static class LoadURL extends AsyncTask<String,Void,ArrayList<MovieItem>>{
-        AsyncTaskCallback callback;
+    public static String downloadUrl(String myurl) throws IOException {
+        InputStream is = null;
+        try {
+            URL url = new URL(myurl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+            //if (conn.getResponseCode() == HttpURLConnection.HTTP_OK)
+            //Log.d(DEBUG_TAG, "The response is: " + response);
+            is = conn.getInputStream();
 
-        public LoadURL(AsyncTaskCallback callback) {
-            this.callback = callback;
-        }
+            // Convert the InputStream into a string
+            StringBuilder buffer = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            callback.showProgressBar();
-        }
-
-        @Override
-        protected ArrayList<MovieItem> doInBackground(String... params) {
-            try {
-                String json = downloadUrl(params[0]);
-                return parseJson(json);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line).append("\n");
             }
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<MovieItem> data) {
-            if(data!=null) {
-                callback.setDataList(data);
-                callback.hideErrorText();
-            }
-            else callback.showErrorText();
-            callback.hideProgressBar();
-        }
-
-        /**
-         * Given a URL, establishes an HttpUrlConnection and retrieves the web page content as a InputStream, which it returns as
-         * a string.
-         */
-        private String downloadUrl(String myurl) throws IOException {
-            InputStream is = null;
-            try {
-                URL url = new URL(myurl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(10000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
-                conn.setRequestMethod("GET");
-                conn.setDoInput(true);
-                conn.connect();
-                //if (conn.getResponseCode() == HttpURLConnection.HTTP_OK)
-                //Log.d(DEBUG_TAG, "The response is: " + response);
-                is = conn.getInputStream();
-
-                // Convert the InputStream into a string
-                StringBuilder buffer = new StringBuilder();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line).append("\n");
-                }
-                Log.i("receivedString",buffer.toString());
-                return buffer.toString();
-                // Makes sure that the InputStream is closed after the app is finished using it.
-            } finally {
-                if (is != null) {
-                    is.close();
-                }
+            Log.i("receivedString",buffer.toString());
+            return buffer.toString();
+            // Makes sure that the InputStream is closed after the app is finished using it.
+        } finally {
+            if (is != null) {
+                is.close();
             }
         }
     }
@@ -181,5 +163,41 @@ public class NetworkUtility {
         if (movieList.isEmpty())
             return null;
         else return movieList;
+    }
+
+    /** Parses the json string for reviews to generate an array list of review items */
+    public static ArrayList<MovieReviewsRecyclerAdapter.ReviewItem> parseReviewJson(String json){
+        ArrayList<MovieReviewsRecyclerAdapter.ReviewItem> reviewItems = new ArrayList<>();
+        try {
+            JSONObject rootObject = new JSONObject(json);
+            JSONArray reviewArray = rootObject.getJSONArray("results");
+            for (int i = 0;i<reviewArray.length();i++){
+                JSONObject reviewItem = reviewArray.getJSONObject(i);
+                MovieReviewsRecyclerAdapter.ReviewItem item = new MovieReviewsRecyclerAdapter.ReviewItem (
+                        reviewItem.getString("author"),reviewItem.getString("content"));
+                reviewItems.add(item);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return reviewItems;
+    }
+
+    /** Parses the json string for trailers to generate an array list of review items */
+    public static ArrayList<MovieTrailersRecyclerAdapter.TrailerItem> parseTrailersJson(String json){
+        ArrayList<MovieTrailersRecyclerAdapter.TrailerItem> trailerItems = new ArrayList<>();
+        try {
+            JSONObject rootObject = new JSONObject(json);
+            JSONArray reviewArray = rootObject.getJSONArray("results");
+            for (int i = 0;i<reviewArray.length();i++){
+                JSONObject reviewItem = reviewArray.getJSONObject(i);
+                MovieTrailersRecyclerAdapter.TrailerItem item = new MovieTrailersRecyclerAdapter.TrailerItem(
+                        reviewItem.getString("key"),reviewItem.getString("name"));
+                trailerItems.add(item);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return trailerItems;
     }
 }

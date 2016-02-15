@@ -38,7 +38,7 @@ public class MovieListFragment extends Fragment implements AsyncTaskCallback{
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if(NetworkUtility.isInternetAvailable(getActivity())) {
-            NetworkUtility.LoadURL task = new NetworkUtility.LoadURL(this);
+            AsyncTasks.FetchMovieList task = new AsyncTasks.FetchMovieList(this);
             task.execute(NetworkUtility.getURLForPopularMovies());
         }
         else {
@@ -49,9 +49,14 @@ public class MovieListFragment extends Fragment implements AsyncTaskCallback{
         mMovieList.setAdapter(new MovieListRecyclerAdapter(new ArrayList<MovieItem>(),getActivity()));
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     /** Updates the recycler view's datalist as received from the async task */
     @Override
-    public void setDataList(ArrayList<MovieItem> dataList) {
+    public void setMovieDataList(ArrayList<MovieItem> dataList) {
         ((MovieListRecyclerAdapter) mMovieList.getAdapter()).setmDataList(dataList);
         mMovieList.getAdapter().notifyDataSetChanged();
     }
@@ -82,4 +87,10 @@ public class MovieListFragment extends Fragment implements AsyncTaskCallback{
         mProgressBar.setIndeterminate(true);
         mProgressBar.setVisibility(View.VISIBLE);
     }
+
+    /** These callback method is not called for this fragment so these may not be implemented */
+    @Override
+    public void setTrailerDataList(ArrayList<MovieTrailersRecyclerAdapter.TrailerItem> dataList) {}
+    @Override
+    public void setReviewDataList(ArrayList<MovieReviewsRecyclerAdapter.ReviewItem> dataList) {}
 }

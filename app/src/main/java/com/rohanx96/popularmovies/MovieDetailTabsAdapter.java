@@ -34,7 +34,9 @@ public class MovieDetailTabsAdapter extends FragmentStatePagerAdapter {
                 trailersFragment.setArguments(arguments);
                 return trailersFragment;
             case 2:
-                return new MovieDetailReviewFragment();
+                MovieDetailReviewFragment reviewFragment = new MovieDetailReviewFragment();
+                reviewFragment.setArguments(arguments);
+                return reviewFragment;
             default:
                 return null;
         }

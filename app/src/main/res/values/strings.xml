@@ -18,4 +18,6 @@
     <string name="top_rated">Top Rated</string>
     <string name="add_favourite">Add To favorites</string>
     <string name="favourites">Favourites</string>
+    <string name="no_reviews">This movie has not been reviewed by anyone yet</string>
+    <string name="no_trailers">No trailers found for this movie</string>
 </resources>

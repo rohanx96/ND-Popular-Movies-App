@@ -72,4 +72,8 @@ public class MovieReviewsRecyclerAdapter extends RecyclerView.Adapter {
             return review;
         }
     }
+
+    public void setmDataList(ArrayList<ReviewItem> mDataList) {
+        this.mDataList = mDataList;
+    }
 }

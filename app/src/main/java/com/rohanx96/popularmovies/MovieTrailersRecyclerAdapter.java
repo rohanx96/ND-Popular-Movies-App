@@ -41,7 +41,7 @@ public class MovieTrailersRecyclerAdapter extends RecyclerView.Adapter<MovieTrai
     @Override
     public void onBindViewHolder(TrailerViewHolder holder, int position) {
         TrailerItem item = mDataList.get(position);
-        Picasso.with(context).load(Uri.parse("http://img.youtube.com/vi/SUXWAEX2jlg/hqdefault.jpg")).into(holder.thumbnail);
+        Picasso.with(context).load(NetworkUtility.generateUriForThumbnail(item.getVideoId())).into(holder.thumbnail);
         holder.trailerName.setText(item.getTrailerName());
     }
 
@@ -78,5 +78,9 @@ public class MovieTrailersRecyclerAdapter extends RecyclerView.Adapter<MovieTrai
         public String getTrailerName() {
             return trailerName;
         }
+    }
+
+    public void setmDataList(ArrayList<TrailerItem> mDataList) {
+        this.mDataList = mDataList;
     }
 }
