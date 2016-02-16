@@ -23,6 +23,7 @@ import java.util.ArrayList;
  * The activity also implements a navigation view which provides options to users to select the sort order of movies
  */
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+    boolean isTabletView; // Stores if the currently loaded view is for a tablet
     String mCurrentSort; // Stores the current sort order displayed
     private final static String SORT_FAVOURITES = "favourites";
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         mCurrentSort = NetworkUtility.SORT_POPULAR; // Sort order is by popularity when activity is started
+        isTabletView = findViewById(R.id.movie_detail_fragment)!=null; // For tablets the detail fragment is not null
     }
 
     @Override
@@ -93,6 +95,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else {
             TextView errorText = (TextView) findViewById(R.id.error_text);
             errorText.setVisibility(View.VISIBLE);
+        }
+        // Remove the detail fragment for previously selected movie for a tablet
+        if (isTabletView){
+            MovieDetailFragment fragment = (MovieDetailFragment) getSupportFragmentManager().findFragmentById(R.id.movie_detail_fragment);
+            if(fragment!=null)
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         }
         item.setChecked(true);
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);

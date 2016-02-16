@@ -20,4 +20,6 @@
     <string name="favourites">Favourites</string>
     <string name="no_reviews">This movie has not been reviewed by anyone yet</string>
     <string name="no_trailers">No trailers found for this movie</string>
+    <string name="share_link">Share Link</string>
+    <string name="select_movie">Select a movie to view its details</string>
 </resources>

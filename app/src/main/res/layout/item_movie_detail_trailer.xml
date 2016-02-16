@@ -4,6 +4,7 @@
   -->
 
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/trailer_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -29,5 +30,11 @@
             android:textColor="@color/white"
             android:layout_margin="8dp"
             android:textAppearance="@style/TextAppearance.AppCompat.SearchResult.Title"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:src="@drawable/ic_play"
+            android:layout_alignParentTop="true"
+            android:scaleType="center"/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

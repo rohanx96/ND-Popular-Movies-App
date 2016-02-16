@@ -10,7 +10,7 @@ import android.support.v7.widget.Toolbar;
 
 /**
  * Created by rose on 3/2/16.
- * Activity that host the Movie Detail Fragment to display the details of the selected movie
+ * Activity that host the Movie Detail Fragment to display the details of the selected movie. This activity is only displayed in phones
  */
 public class MovieDetailActivity extends AppCompatActivity {
     @Override

@@ -7,6 +7,8 @@ package com.rohanx96.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -30,10 +32,12 @@ import butterknife.OnClick;
  */
 public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
     ArrayList<MovieItem> mDataList;
-    Context context;
-    public MovieListRecyclerAdapter(ArrayList<MovieItem> mDataList, Context context) {
+    boolean isTablet;
+    FragmentActivity context;
+    public MovieListRecyclerAdapter(ArrayList<MovieItem> mDataList, FragmentActivity context,boolean isTablet) {
         this.mDataList = mDataList;
         this.context = context;
+        this.isTablet = isTablet;
     }
 
     @Override
@@ -79,12 +83,23 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         @OnClick(R.id.movie_item_card)
+        /** Starts the detail activity. For tablets replaces the corresponding fragment */
         public void startDetailActivity(View v){
             MovieItem item = mDataList.get(getAdapterPosition());
-            Intent details = new Intent(context,MovieDetailActivity.class);
-            // Pass the movie item object to the intent so they can be fetched in the new activity
-            details.putExtra("movie_item", item);
-            context.startActivity(details);
+            if (isTablet){
+                Bundle args = new Bundle();
+                // Put the parcelable object received from intent into the bundle
+                args.putParcelable("movie_item",item);
+                MovieDetailFragment fragment = new MovieDetailFragment();
+                fragment.setArguments(args);
+                context.getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_fragment, fragment).commit();
+            }
+            else {
+                Intent details = new Intent(context, MovieDetailActivity.class);
+                // Pass the movie item object to the intent so they can be fetched in the new activity
+                details.putExtra("movie_item", item);
+                context.startActivity(details);
+            }
         }
     }
 }

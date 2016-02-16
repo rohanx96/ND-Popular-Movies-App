@@ -6,11 +6,15 @@ package com.rohanx96.popularmovies;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -120,6 +124,33 @@ public class MovieDetailOverviewFragment extends Fragment {
             contentResolver.insert(FavouritesContract.FavouritesEntry.CONTENT_URI, contentValues);
             isFavourite = true;
             mAddFavourite.setImageResource(R.drawable.ic_heart_checked);
+        }
+    }
+
+    @OnClick(R.id.movie_detail_share)
+    /** Creates a chooser to Share the trailer link. If no trailer is found displays a dialog */
+    public void shareTrailer(){
+        RecyclerView trailerList = (RecyclerView) getActivity().findViewById(R.id.movie_detail_trailer_list);
+        // no trailers
+        if(((MovieTrailersRecyclerAdapter) trailerList.getAdapter()).getmDataList().size()==0){
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getActivity());
+            dialogBuilder.setMessage(getString(R.string.no_trailers))
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create()
+                    .show();
+        }
+        //Share the link
+        else {
+            String id = ((MovieTrailersRecyclerAdapter) trailerList.getAdapter()).getmDataList().get(0).getVideoId();
+            Intent share = new Intent(Intent.ACTION_SEND);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + id);
+            startActivity(Intent.createChooser(share,getString(R.string.share_link)));
         }
     }
 }

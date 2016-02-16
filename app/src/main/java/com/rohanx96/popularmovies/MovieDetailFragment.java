@@ -17,7 +17,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * This fragment hsots the tabs for viewing various movie details like overview and reviews
+ * This fragment hosts the tabs for viewing various movie details like overview and reviews
  * Created by rose on 15/2/16.
  */
 public class MovieDetailFragment extends Fragment {

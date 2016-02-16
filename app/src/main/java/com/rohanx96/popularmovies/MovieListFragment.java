@@ -4,14 +4,18 @@
 
 package com.rohanx96.popularmovies;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -23,6 +27,7 @@ import java.util.ArrayList;
  * the navigation view in the activity
  */
 public class MovieListFragment extends Fragment implements AsyncTaskCallback{
+    boolean isTabletView; // Stores if the currently loaded view is for a tablet
     RecyclerView mMovieList;
     ProgressBar mProgressBar;
     @Nullable
@@ -45,8 +50,16 @@ public class MovieListFragment extends Fragment implements AsyncTaskCallback{
             TextView errorText = (TextView) getActivity().findViewById(R.id.error_text);
             errorText.setVisibility(View.VISIBLE);
         }
-        mMovieList.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        mMovieList.setAdapter(new MovieListRecyclerAdapter(new ArrayList<MovieItem>(),getActivity()));
+        isTabletView = getActivity().findViewById(R.id.movie_detail_fragment)!=null;
+
+        /* We get the screen orientation and if the orientation is landscape then we display 3 items in single row of list */
+        Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int rotation = display.getRotation();
+        if(rotation== Surface.ROTATION_90 || rotation == Surface.ROTATION_270)
+            mMovieList.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        else mMovieList.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+
+        mMovieList.setAdapter(new MovieListRecyclerAdapter(new ArrayList<MovieItem>(),getActivity(),isTabletView));
     }
 
     @Override

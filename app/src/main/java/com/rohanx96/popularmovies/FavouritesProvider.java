@@ -15,6 +15,8 @@ import android.util.Log;
 
 
 /**
+ * Content provider for the application. This content provider provides access to the favourites table of popular movies database.
+ * It supports two basic query uris along with insert and delete uris for favourites table
  * Created by rose on 14/2/16.
  */
 public class FavouritesProvider extends ContentProvider {
