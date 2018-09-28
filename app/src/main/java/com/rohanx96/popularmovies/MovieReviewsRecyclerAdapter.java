@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -45,9 +45,9 @@ public class MovieReviewsRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     class ReviewViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.review_user_name)
+        @BindView(R.id.review_user_name)
         TextView userName;
-        @Bind(R.id.review_detail) TextView reviewText;
+        @BindView(R.id.review_detail) TextView reviewText;
         public ReviewViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);

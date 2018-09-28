@@ -19,7 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -44,7 +44,7 @@ public class MovieTrailersRecyclerAdapter extends RecyclerView.Adapter<MovieTrai
     @Override
     public void onBindViewHolder(TrailerViewHolder holder, int position) {
         TrailerItem item = mDataList.get(position);
-        Picasso.with(context).load(NetworkUtility.generateUriForThumbnail(item.getVideoId())).into(holder.thumbnail);
+        Picasso.get().load(NetworkUtility.generateUriForThumbnail(item.getVideoId())).into(holder.thumbnail);
         holder.trailerName.setText(item.getTrailerName());
     }
 
@@ -54,9 +54,9 @@ public class MovieTrailersRecyclerAdapter extends RecyclerView.Adapter<MovieTrai
     }
 
     public class TrailerViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.trailer_thumbnail)
+        @BindView(R.id.trailer_thumbnail)
         ImageView thumbnail;
-        @Bind(R.id.trailer_name)
+        @BindView(R.id.trailer_name)
         TextView trailerName;
         public TrailerViewHolder(View itemView) {
             super(itemView);

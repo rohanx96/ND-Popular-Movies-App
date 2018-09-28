@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -21,8 +21,8 @@ import butterknife.ButterKnife;
  * Created by rose on 15/2/16.
  */
 public class MovieDetailFragment extends Fragment {
-    @Bind(R.id.movie_detail_tabs) TabLayout tabLayout;
-    @Bind(R.id.movie_detail_view_pager) ViewPager viewPager;
+    @BindView(R.id.movie_detail_tabs) TabLayout tabLayout;
+    @BindView(R.id.movie_detail_view_pager) ViewPager viewPager;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

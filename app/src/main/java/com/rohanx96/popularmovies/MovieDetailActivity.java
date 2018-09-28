@@ -19,10 +19,13 @@ public class MovieDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_detail);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Parent activity set as Main Activity in Manifest
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(((MovieItem) getIntent().getParcelableExtra("movie_item")).getName());
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Parent activity set as Main Activity in Manifest
+        }
         Bundle args = new Bundle();
         // Put the parcelable object received from intent into the bundle
-        args.putParcelable("movie_item",getIntent().getParcelableExtra("movie_item"));
+        args.putParcelable("movie_item", getIntent().getParcelableExtra("movie_item"));
         MovieDetailFragment fragment = new MovieDetailFragment();
         fragment.setArguments(args);
         getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_fragment, fragment).commit();

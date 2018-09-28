@@ -4,12 +4,10 @@
 
 package com.rohanx96.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +20,7 @@ import com.squareup.picasso.Picasso;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -34,26 +32,28 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
     ArrayList<MovieItem> mDataList;
     boolean isTablet;
     FragmentActivity context;
-    public MovieListRecyclerAdapter(ArrayList<MovieItem> mDataList, FragmentActivity context,boolean isTablet) {
+
+    public MovieListRecyclerAdapter(ArrayList<MovieItem> mDataList, FragmentActivity context, boolean isTablet) {
         this.mDataList = mDataList;
         this.context = context;
         this.isTablet = isTablet;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new MovieItemViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_movie_list,parent,false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new MovieItemViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_movie_list, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         MovieItemViewHolder viewHolder = (MovieItemViewHolder) holder;
         MovieItem item = mDataList.get(position);
         try {
             // error() sets the drawable when there is problem loading url or some error occurs. It also prevents null exceptions caused due to
             // errors. It will retry three times before setting the error image
-           Picasso.with(context).load(NetworkUtility.generateUrlForImage(item.getImage())).placeholder(R.drawable.default_movie_poster)
-                   .error(R.drawable.default_movie_poster).into(viewHolder.movieImage);
+            Picasso.get().load(NetworkUtility.generateUrlForImage(item.getImage())).placeholder(R.drawable.default_movie_poster)
+                    .error(R.drawable.default_movie_poster).into(viewHolder.movieImage);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -74,27 +74,28 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     class MovieItemViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.movie_item_image) ImageView movieImage;
-        @Bind(R.id.movie_item_name) TextView movieName;
+        @BindView(R.id.movie_item_image)
+        ImageView movieImage;
+        @BindView(R.id.movie_item_name)
+        TextView movieName;
 
         public MovieItemViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         @OnClick(R.id.movie_item_card)
         /** Starts the detail activity. For tablets replaces the corresponding fragment */
-        public void startDetailActivity(View v){
+        public void startDetailActivity(View v) {
             MovieItem item = mDataList.get(getAdapterPosition());
-            if (isTablet){
+            if (isTablet) {
                 Bundle args = new Bundle();
                 // Put the parcelable object received from intent into the bundle
-                args.putParcelable("movie_item",item);
+                args.putParcelable("movie_item", item);
                 MovieDetailFragment fragment = new MovieDetailFragment();
                 fragment.setArguments(args);
                 context.getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_fragment, fragment).commit();
-            }
-            else {
+            } else {
                 Intent details = new Intent(context, MovieDetailActivity.class);
                 // Pass the movie item object to the intent so they can be fetched in the new activity
                 details.putExtra("movie_item", item);

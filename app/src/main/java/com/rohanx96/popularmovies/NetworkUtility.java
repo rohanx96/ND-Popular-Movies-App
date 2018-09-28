@@ -42,7 +42,7 @@ public class NetworkUtility {
     public static final String PATH_VIDEOS = "videos";
     public static final String PATH_REVIEWS = "reviews";
     public static final String API_KEY_PARAM = "api_key";
-    public static final String API_KEY = "";
+    public static final String API_KEY = "0d31f70134d991904eadf56c2f2237da";
 
     /** Generates URL string query for fetching movies sorted by popularity */
     public static String getURLForPopularMovies() {

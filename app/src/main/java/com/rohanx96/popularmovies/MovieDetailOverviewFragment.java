@@ -30,7 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -39,13 +39,13 @@ import butterknife.OnClick;
  * Fragment that displays the selected movie's details
  */
 public class MovieDetailOverviewFragment extends Fragment {
-    @Bind(R.id.movie_detail_name) TextView mName;
-    @Bind(R.id.movie_detail_overview)TextView mOverview;
-    @Bind(R.id.movie_detail_rating)TextView mRating;
-    @Bind(R.id.movie_detail_popularity)TextView mPopularity;
-    @Bind(R.id.movie_detail_image)ImageView mImage;
-    @Bind(R.id.movie_detail_date)TextView mDate;
-    @Bind(R.id.movie_detail_add_favorite) ImageButton mAddFavourite;
+    @BindView(R.id.movie_detail_name) TextView mName;
+    @BindView(R.id.movie_detail_overview)TextView mOverview;
+    @BindView(R.id.movie_detail_rating)TextView mRating;
+    @BindView(R.id.movie_detail_popularity)TextView mPopularity;
+    @BindView(R.id.movie_detail_image)ImageView mImage;
+    @BindView(R.id.movie_detail_date)TextView mDate;
+    @BindView(R.id.movie_detail_add_favorite) ImageButton mAddFavourite;
     private MovieItem mItem;
     private boolean isFavourite; // Stores if the movie is added to favourites
 
@@ -70,7 +70,7 @@ public class MovieDetailOverviewFragment extends Fragment {
         try {
             // error() sets the drawable when there is problem loading url or some error occurs. It also prevents null exceptions caused due to
             // errors. It will retry three times before setting the error image
-            Picasso.with(getActivity()).load(NetworkUtility.generateUrlForImage(mItem.getImage())).placeholder(R.drawable.default_movie_poster)
+            Picasso.get().load(NetworkUtility.generateUrlForImage(mItem.getImage())).placeholder(R.drawable.default_movie_poster)
                     .error(R.drawable.default_movie_poster).into(mImage);
         } catch (MalformedURLException e) {
             e.printStackTrace();

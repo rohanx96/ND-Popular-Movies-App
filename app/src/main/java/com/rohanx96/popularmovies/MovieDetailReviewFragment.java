@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -25,9 +25,9 @@ import butterknife.ButterKnife;
  * Created by rose on 15/2/16.
  */
 public class MovieDetailReviewFragment extends Fragment implements AsyncTaskCallback{
-    @Bind(R.id.movie_detail_review_list) RecyclerView reviewList;
-    @Bind(R.id.progress_bar) ProgressBar mProgressBar;
-    @Bind(R.id.error_text) TextView errorText;
+    @BindView(R.id.movie_detail_review_list) RecyclerView reviewList;
+    @BindView(R.id.progress_bar) ProgressBar mProgressBar;
+    @BindView(R.id.error_text) TextView errorText;
 
     @Nullable
     @Override
