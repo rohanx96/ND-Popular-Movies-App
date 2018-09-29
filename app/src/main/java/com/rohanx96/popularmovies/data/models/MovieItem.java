@@ -2,11 +2,13 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.data.models;
 
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.rohanx96.popularmovies.data.FavouritesContract;
 
 /**
  * Created by rose on 2/2/16.

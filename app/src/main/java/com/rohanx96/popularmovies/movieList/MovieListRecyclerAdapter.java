@@ -2,12 +2,14 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.movieList;
 
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.rohanx96.popularmovies.data.models.MovieItem;
+import com.rohanx96.popularmovies.network.NetworkUtility;
+import com.rohanx96.popularmovies.R;
+import com.rohanx96.popularmovies.movieDetails.MovieDetailActivity;
+import com.rohanx96.popularmovies.movieDetails.MovieDetailFragment;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
@@ -47,13 +55,29 @@ public class MovieListRecyclerAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        MovieItemViewHolder viewHolder = (MovieItemViewHolder) holder;
+        final MovieItemViewHolder viewHolder = (MovieItemViewHolder) holder;
         MovieItem item = mDataList.get(position);
         try {
             // error() sets the drawable when there is problem loading url or some error occurs. It also prevents null exceptions caused due to
             // errors. It will retry three times before setting the error image
             Picasso.get().load(NetworkUtility.generateUrlForImage(item.getImage())).placeholder(R.drawable.default_movie_poster)
-                    .error(R.drawable.default_movie_poster).into(viewHolder.movieImage);
+                    .error(R.drawable.default_movie_poster).into(viewHolder.movieImage, new Callback() {
+                @Override
+                public void onSuccess() {
+                    Palette p = Palette.from(((BitmapDrawable) viewHolder.movieImage.getDrawable()).getBitmap()).generate();
+                    Palette.Swatch color = p.getDominantSwatch();
+                    if (color != null) {
+                        viewHolder.movieName.setBackgroundColor(color.getRgb());
+                        viewHolder.movieName.setTextColor(color.getTitleTextColor());
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+
+                }
+            });
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

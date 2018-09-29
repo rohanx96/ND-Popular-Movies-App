@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.movieDetails;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,9 +15,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  */
 public class MovieDetailTabsAdapter extends FragmentStatePagerAdapter {
     private String[] titles = new String[]{"Overview","Trailers","Reviews"};
-    Bundle arguments;
+    private Bundle arguments;
 
-    public MovieDetailTabsAdapter(FragmentManager fm, Bundle arguments) {
+    MovieDetailTabsAdapter(FragmentManager fm, Bundle arguments) {
         super(fm);
         this.arguments = arguments;
     }

@@ -2,12 +2,12 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.rohanx96.popularmovies.FavouritesContract.FavouritesEntry;
+import com.rohanx96.popularmovies.data.FavouritesContract.FavouritesEntry;
 
 /**
  * The database helper class to get readable or writable database for our application

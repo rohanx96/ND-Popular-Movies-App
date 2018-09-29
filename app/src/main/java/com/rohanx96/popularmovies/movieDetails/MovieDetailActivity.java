@@ -2,11 +2,14 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.movieDetails;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import com.rohanx96.popularmovies.data.models.MovieItem;
+import com.rohanx96.popularmovies.R;
 
 /**
  * Created by rose on 3/2/16.
@@ -17,7 +20,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_detail);
+        Toolbar toolbar = findViewById(R.id.toolbar_detail);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(((MovieItem) getIntent().getParcelableExtra("movie_item")).getName());

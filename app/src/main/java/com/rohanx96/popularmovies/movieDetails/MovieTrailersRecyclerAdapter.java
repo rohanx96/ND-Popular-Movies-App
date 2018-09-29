@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.movieDetails;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.rohanx96.popularmovies.R;
+import com.rohanx96.popularmovies.network.NetworkUtility;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

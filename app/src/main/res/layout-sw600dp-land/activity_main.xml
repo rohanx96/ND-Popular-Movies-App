@@ -15,12 +15,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/background"
-        tools:context="com.rohanx96.popularmovies.MainActivity">
+        tools:context="com.rohanx96.popularmovies.movieList.MainActivity">
         <include layout="@layout/toolbar"
             android:id="@+id/toolbar_home"/>
         <fragment
             android:id="@+id/movie_list_fragment_container"
-            android:name="com.rohanx96.popularmovies.MovieListFragment"
+            android:name="com.rohanx96.popularmovies.movieList.MovieListFragment"
             android:layout_width="480dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/toolbar_home"

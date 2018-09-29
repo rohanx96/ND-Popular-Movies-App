@@ -11,20 +11,26 @@
         android:theme="@style/AppTheme">
         <provider
             android:authorities="com.rohanx96.popularmovies"
-            android:name=".FavouritesProvider"/>
-        <activity android:name=".MainActivity"
+            android:name=".data.FavouritesProvider"/>
+        <activity android:name=".movieList.MainActivity"
             android:label="@string/movies"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MovieDetailActivity"
+        <activity android:name=".movieDetails.MovieDetailActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:label="Movie Details"
-            android:parentActivityName=".MainActivity"/>
+            android:configChanges="orientation"
+            android:parentActivityName=".movieList.MainActivity"/>
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

@@ -2,14 +2,21 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.network;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
+
+import com.rohanx96.popularmovies.R;
+import com.rohanx96.popularmovies.data.FavouritesContract;
+import com.rohanx96.popularmovies.movieDetails.MovieReviewsRecyclerAdapter;
+import com.rohanx96.popularmovies.movieDetails.MovieTrailersRecyclerAdapter;
+import com.rohanx96.popularmovies.data.models.MovieItem;
+import com.rohanx96.popularmovies.movieList.MovieListFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,64 +46,128 @@ public class NetworkUtility {
     public static final String SORT_RATING = "vote_average.desc";
     public static final String SORT_LATEST = "primary_release_date.desc";
     public static final String SORT_REVENUE = "revenue.desc";
+    public final static String SORT_FAVOURITES = "favourites";
     public static final String PATH_VIDEOS = "videos";
     public static final String PATH_REVIEWS = "reviews";
     public static final String API_KEY_PARAM = "api_key";
     public static final String API_KEY = "0d31f70134d991904eadf56c2f2237da";
 
-    /** Generates URL string query for fetching movies sorted by popularity */
+    /**
+     * Generates URL string query for fetching movies sorted by popularity
+     */
     public static String getURLForPopularMovies() {
-        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_POPULAR).appendQueryParameter(API_KEY_PARAM, API_KEY).build();
+        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY, SORT_POPULAR).appendQueryParameter(API_KEY_PARAM, API_KEY).build();
         return builtUri.toString();
     }
 
-    /** Generates URL string query for fetching movies sorted by rating */
-    public static String getUrlForTopRatedMovies(){
-        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_RATING)
+    /**
+     * Generates URL string query for fetching movies sorted by rating
+     */
+    public static String getUrlForTopRatedMovies() {
+        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY, SORT_RATING)
                 .appendQueryParameter(API_KEY_PARAM, API_KEY).build();
         return builtUri.toString();
     }
 
-    /** Generates URL string query for fetching movies sorted by release date */
-    public static String getUrlForLatestMovies(){
-        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_LATEST)
-                .appendQueryParameter(API_KEY_PARAM,API_KEY).build();
+    /**
+     * Generates URL string query for fetching movies sorted by release date
+     */
+    public static String getUrlForLatestMovies() {
+        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY, SORT_LATEST)
+                .appendQueryParameter(API_KEY_PARAM, API_KEY).build();
         return builtUri.toString();
     }
 
-    /** Generates URL string query for fetching movies sorted by revenue */
-    public static String getUrlForTopGrossingMovies(){
-        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY,SORT_REVENUE)
-                .appendQueryParameter(API_KEY_PARAM,API_KEY).build();
+    /**
+     * Generates URL string query for fetching movies sorted by revenue
+     */
+    public static String getUrlForTopGrossingMovies() {
+        Uri builtUri = Uri.parse(MAIN_URL_DISCOVER).buildUpon().appendQueryParameter(SORT_KEY, SORT_REVENUE)
+                .appendQueryParameter(API_KEY_PARAM, API_KEY).build();
         return builtUri.toString();
     }
 
-    /** Generates URL string query for fetching movie poster according to file path received */
+    /**
+     * Generates URL string query for fetching movie poster according to file path received
+     */
     public static Uri generateUrlForImage(String path) throws MalformedURLException {
         Uri builtUri = Uri.parse(IMAGE_MAIN_URL).buildUpon().appendPath(IMAGE_SIZE).appendPath(path).build();
         //Log.i("imageUri",builtUri.toString());
         return builtUri;
     }
 
-    /** Generates uri for videos based on ID received for the movie */
-    public static Uri generateUriForVideos(String key){
-        return Uri.parse(MAIN_URL_MOVIE).buildUpon().appendPath(key).appendPath(PATH_VIDEOS).appendQueryParameter(API_KEY_PARAM,API_KEY)
-        .build();
+    public static String getUrlForCurrentSort(String sortOrder) {
+        switch (sortOrder) {
+            case SORT_POPULAR:
+                return getURLForPopularMovies();
+            case SORT_LATEST:
+                return getUrlForLatestMovies();
+            case SORT_RATING:
+                return getUrlForTopRatedMovies();
+            case SORT_REVENUE:
+                return getUrlForTopGrossingMovies();
+            case SORT_FAVOURITES:
+                return SORT_FAVOURITES;
+            default:
+                return getURLForPopularMovies();
+        }
     }
 
-    /** Generates uri for reviews based on ID received for the movie */
-    public static Uri generateUriForReviews(String key){
-        return Uri.parse(MAIN_URL_MOVIE).buildUpon().appendPath(key).appendPath(PATH_REVIEWS).appendQueryParameter(API_KEY_PARAM,API_KEY)
+    /**
+     * Refreshes data list when a new sort order is selected
+     */
+    public static void fetchDataAndUpdateDataList(String sortOrder, Context context, AsyncTaskCallback.FetchMovieTaskCallback callback) {
+
+        // If the user chooses to view favourites load the datalist from database accordingly
+        if (sortOrder.equals(SORT_FAVOURITES)) {
+            Cursor cursor = context.getContentResolver().query(FavouritesContract.FavouritesEntry.CONTENT_URI,
+                    null, null, null, null);
+            ArrayList<MovieItem> dataList = new ArrayList<>();
+            if (cursor != null) {
+                try {
+                    if (cursor.moveToFirst()) {
+                        do {
+                            dataList.add(MovieItem.createMovieItemFromDatabase(cursor));
+                        } while (cursor.moveToNext());
+                    }
+                } finally {
+                    cursor.close();
+                    callback.setMovieDataList(dataList);
+                }
+            }
+        } else {
+            AsyncTasks.FetchMovieList task = new AsyncTasks.FetchMovieList(callback);
+            task.execute(sortOrder);
+        }
+    }
+
+    /**
+     * Generates uri for videos based on ID received for the movie
+     */
+    public static Uri generateUriForVideos(String key) {
+        return Uri.parse(MAIN_URL_MOVIE).buildUpon().appendPath(key).appendPath(PATH_VIDEOS).appendQueryParameter(API_KEY_PARAM, API_KEY)
                 .build();
     }
 
-    /** Generates uri to get video thumbnail from video id */
-    public static Uri generateUriForThumbnail(String key){
+    /**
+     * Generates uri for reviews based on ID received for the movie
+     */
+    public static Uri generateUriForReviews(String key) {
+        return Uri.parse(MAIN_URL_MOVIE).buildUpon().appendPath(key).appendPath(PATH_REVIEWS).appendQueryParameter(API_KEY_PARAM, API_KEY)
+                .build();
+    }
+
+    /**
+     * Generates uri to get video thumbnail from video id
+     */
+    public static Uri generateUriForThumbnail(String key) {
         return Uri.parse(YOUTUBE_THUMBNAIL_URL).buildUpon().appendPath(key).appendPath("hqdefault.jpg").build();
     }
 
-    /** Checks if internet is available */
-    public static boolean isInternetAvailable(Context context){
+    /**
+     * Checks if internet is available
+     */
+    public static boolean isInternetAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         return (info != null && info.isConnected());
@@ -128,7 +199,7 @@ public class NetworkUtility {
             while ((line = reader.readLine()) != null) {
                 buffer.append(line).append("\n");
             }
-            Log.i("receivedString",buffer.toString());
+            Log.i("receivedString", buffer.toString());
             return buffer.toString();
             // Makes sure that the InputStream is closed after the app is finished using it.
         } finally {
@@ -138,13 +209,15 @@ public class NetworkUtility {
         }
     }
 
-    /** Parses the JSON string received to generate an ArrayList of MovieItem objects */
-    public static ArrayList<MovieItem> parseJson(String jsonString){
+    /**
+     * Parses the JSON string received to generate an ArrayList of MovieItem objects
+     */
+    public static ArrayList<MovieItem> parseJson(String jsonString) {
         ArrayList<MovieItem> movieList = new ArrayList<>();
         try {
             JSONObject rootObject = new JSONObject(jsonString);
             JSONArray moviesArray = rootObject.getJSONArray("results");
-            for(int i = 0;i<moviesArray.length();i++) {
+            for (int i = 0; i < moviesArray.length(); i++) {
                 JSONObject movieObject = moviesArray.getJSONObject(i);
                 MovieItem item = new MovieItem();
                 // The keys are set according to the default format provided by TheMovieDb API for discover query
@@ -165,16 +238,18 @@ public class NetworkUtility {
         else return movieList;
     }
 
-    /** Parses the json string for reviews to generate an array list of review items */
-    public static ArrayList<MovieReviewsRecyclerAdapter.ReviewItem> parseReviewJson(String json){
+    /**
+     * Parses the json string for reviews to generate an array list of review items
+     */
+    public static ArrayList<MovieReviewsRecyclerAdapter.ReviewItem> parseReviewJson(String json) {
         ArrayList<MovieReviewsRecyclerAdapter.ReviewItem> reviewItems = new ArrayList<>();
         try {
             JSONObject rootObject = new JSONObject(json);
             JSONArray reviewArray = rootObject.getJSONArray("results");
-            for (int i = 0;i<reviewArray.length();i++){
+            for (int i = 0; i < reviewArray.length(); i++) {
                 JSONObject reviewItem = reviewArray.getJSONObject(i);
-                MovieReviewsRecyclerAdapter.ReviewItem item = new MovieReviewsRecyclerAdapter.ReviewItem (
-                        reviewItem.getString("author"),reviewItem.getString("content"));
+                MovieReviewsRecyclerAdapter.ReviewItem item = new MovieReviewsRecyclerAdapter.ReviewItem(
+                        reviewItem.getString("author"), reviewItem.getString("content"));
                 reviewItems.add(item);
             }
         } catch (JSONException e) {
@@ -183,16 +258,18 @@ public class NetworkUtility {
         return reviewItems;
     }
 
-    /** Parses the json string for trailers to generate an array list of review items */
-    public static ArrayList<MovieTrailersRecyclerAdapter.TrailerItem> parseTrailersJson(String json){
+    /**
+     * Parses the json string for trailers to generate an array list of review items
+     */
+    public static ArrayList<MovieTrailersRecyclerAdapter.TrailerItem> parseTrailersJson(String json) {
         ArrayList<MovieTrailersRecyclerAdapter.TrailerItem> trailerItems = new ArrayList<>();
         try {
             JSONObject rootObject = new JSONObject(json);
             JSONArray reviewArray = rootObject.getJSONArray("results");
-            for (int i = 0;i<reviewArray.length();i++){
+            for (int i = 0; i < reviewArray.length(); i++) {
                 JSONObject reviewItem = reviewArray.getJSONObject(i);
                 MovieTrailersRecyclerAdapter.TrailerItem item = new MovieTrailersRecyclerAdapter.TrailerItem(
-                        reviewItem.getString("key"),reviewItem.getString("name"));
+                        reviewItem.getString("key"), reviewItem.getString("name"));
                 trailerItems.add(item);
             }
         } catch (JSONException e) {

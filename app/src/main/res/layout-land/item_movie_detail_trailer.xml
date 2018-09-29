@@ -18,8 +18,8 @@
         <ImageView
             android:id="@+id/trailer_thumbnail"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:scaleType="fitXY"
+            android:layout_height="280dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/default_movie_poster"/>
         <TextView
             android:id="@+id/trailer_name"

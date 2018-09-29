@@ -2,7 +2,7 @@
  * Copyright (c) 2016. Rohan Agarwal (rOhanX96)
  */
 
-package com.rohanx96.popularmovies;
+package com.rohanx96.popularmovies.data;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
